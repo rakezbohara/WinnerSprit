@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Winner Sprit</string>
+
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="facebook_login">Sign in with facebook</string>
+    <string name="google_login">Sign in with google</string>
+
+    <string name="facebook_app_id">1882203458760601</string>
+    <string name="login_with_winnersprit"><u><b>Login</b></u> using Winner Sprit</string>
+    <string name="register_with_winnersprit">Not Registered yet? <u><b>Register Now</b></u></string>
+    <string name="email_hint">Email Address</string>
+    <string name="password_hint">Password</string>
+    <string name="confirm_password_hint">Confirm Password</string>
+    <string name="app_login">LOGIN</string>
+    <string name="app_register">REGISTER</string>
+    <string name="title_activity_course_selector">CourseSelector</string>
+</resources>

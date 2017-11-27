@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "604983271475",
+    "firebase_url": "https://winner-sprit.firebaseio.com",
+    "project_id": "winner-sprit",
+    "storage_bucket": "winner-sprit.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:604983271475:android:f087c5ad962760c6",
+        "android_client_info": {
+          "package_name": "com.app.rakez.winnersprit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "604983271475-8mest0lma0051ate08qnu6ds58jcgcoj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.rakez.winnersprit",
+            "certificate_hash": "cd6679c580f94362ffc233ca18c178f2f51ea587"
+          }
+        },
+        {
+          "client_id": "604983271475-tbps5c8khklkk0ig433j06kurj9ah5jv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBndPJ853VSFeGtl_tQi3PXPSVIb5s5b-4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "604983271475-tbps5c8khklkk0ig433j06kurj9ah5jv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

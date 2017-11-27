@@ -1,0 +1,33 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
+    tools:context="com.app.rakez.winnersprit.CourseSelector">
+
+    <StackView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/course_SV"
+        android:layout_marginTop="80dp"
+        android:layout_marginBottom="160dp">
+    </StackView>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="60dp"
+        android:background="@color/login_button"
+        android:textColor="@color/text_color"
+        android:id="@+id/next_button"
+        android:text="Proceed"
+        android:textAllCaps="true"
+        android:textSize="20dp"
+        android:drawableRight="@drawable/ic_arrow_forward"
+        android:textAlignment="viewEnd"
+        android:padding="8dp"/>
+
+</RelativeLayout>
