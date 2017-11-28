@@ -19,4 +19,8 @@
 
     <color name="score_color">#FFC107</color>
 
+    //Level colors
+    <color name="level_active">#dd4b39</color>
+    <color name="level_inactive">#d6958d</color>
+
 </resources>

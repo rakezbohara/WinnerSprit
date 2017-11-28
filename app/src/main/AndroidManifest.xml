@@ -36,6 +36,7 @@
             android:name=".quiz.MainContainer"
             android:label="@string/title_activity_main_container"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
     </application>
 
 </manifest>
