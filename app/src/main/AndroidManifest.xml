@@ -29,8 +29,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".CourseSelector"
+            android:name=".selection.CourseSelector"
             android:label="@string/title_activity_course_selector"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".quiz.MainContainer"
+            android:label="@string/title_activity_main_container"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

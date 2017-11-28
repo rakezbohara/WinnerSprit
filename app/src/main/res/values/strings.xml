@@ -16,4 +16,10 @@
     <string name="app_login">LOGIN</string>
     <string name="app_register">REGISTER</string>
     <string name="title_activity_course_selector">CourseSelector</string>
+    <string name="title_activity_main_container">EPN</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 </resources>

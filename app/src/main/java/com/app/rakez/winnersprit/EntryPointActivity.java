@@ -24,6 +24,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.app.rakez.winnersprit.data.SharedPref;
+import com.app.rakez.winnersprit.quiz.MainContainer;
+import com.app.rakez.winnersprit.selection.CourseSelector;
 import com.app.rakez.winnersprit.util.ImageUtils;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -112,7 +114,17 @@ public class EntryPointActivity extends AppCompatActivity implements View.OnClic
         firebaseAuth = FirebaseAuth.getInstance();
         currentUser = firebaseAuth.getCurrentUser();
         if(currentUser!=null){
-            //start the new activity for next screen
+            Intent nextActivity;
+            if(!sharedPref.ifExist("uid")){
+                saveUserData(currentUser);
+            }
+            if(sharedPref.ifExist("course_id")){
+                nextActivity = new Intent(this, MainContainer.class);
+            }else{
+                nextActivity = new Intent(this , CourseSelector.class);
+            }
+            startActivity(nextActivity);
+            finish();
         }
         emailLoginLayout.setVisibility(View.GONE);
         emailRegisterLayout.setVisibility(View.GONE);
@@ -441,19 +453,31 @@ public class EntryPointActivity extends AppCompatActivity implements View.OnClic
     }
     //Email registration ends here
     void successLogin(FirebaseUser currentUser){
-        if(currentUser.getPhotoUrl()!=null){
-            new DownloadImage().execute(currentUser.getPhotoUrl().toString(),currentUser.getUid());
-        }
-        sharedPref.saveData("name",currentUser.getDisplayName());
-        sharedPref.saveData("uid",currentUser.getUid());
-        sharedPref.saveData("email",currentUser.getEmail());
-        sharedPref.saveData("login_provider",loginProvider);
+        saveUserData(currentUser);
         Log.d(TAG,"Name : "+ currentUser.getDisplayName());
         Log.d(TAG,"Photo : "+ currentUser.getPhotoUrl());
         Log.d(TAG,"Email : "+ currentUser.getEmail());
         Log.d(TAG,"UID : "+ currentUser.getUid());
         Log.d(TAG, "Provider :"+loginProvider);
+        Intent in = new Intent(this, CourseSelector.class);
+        startActivity(in);
     }
+
+    void saveUserData(FirebaseUser user){
+        if(user.getPhotoUrl()!=null){
+            new DownloadImage().execute(user.getPhotoUrl().toString(),user.getUid());
+        }
+        sharedPref.saveData("name",user.getDisplayName());
+        sharedPref.saveData("uid",user.getUid());
+        sharedPref.saveData("email",user.getEmail());
+        sharedPref.saveData("login_provider",loginProvider);
+        if(user.getPhotoUrl()==null){
+            sharedPref.saveData("image_exist",false);
+        }else{
+            sharedPref.saveData("image_exist",true);
+        }
+    }
+
     void errorLogin(String error){
         final Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), error, Snackbar.LENGTH_INDEFINITE);
         snackbar.setAction("OKAY", new View.OnClickListener() {
@@ -521,4 +545,5 @@ public class EntryPointActivity extends AppCompatActivity implements View.OnClic
             return true;
         }
     }
+
 }

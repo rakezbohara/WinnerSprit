@@ -26,7 +26,13 @@ public class SharedPref {
         if(editor.commit()){
             Log.d(TAG,key+" Data is saved "+value);
         }
+    }
 
+    public void saveData(String key, boolean value){
+        editor.putBoolean(key,value);
+        if(editor.commit()){
+            Log.d(TAG,key+" Data is saved "+value);
+        }
     }
 
     public void saveData(String key, String value){
@@ -45,6 +51,19 @@ public class SharedPref {
     public String getStringData(String key){
         Log.d(TAG,key+" Data is fetched "+sharedPreferences.getString(key,null));
         return sharedPreferences.getString(key, null);
+    }
+
+    public Boolean getBooleanData(String key){
+        Log.d(TAG,key+" Data is fetched "+sharedPreferences.getBoolean(key,false));
+        return sharedPreferences.getBoolean(key, false);
+    }
+
+    public boolean ifExist(String key){
+        return sharedPreferences.contains(key);
+    }
+
+    public boolean clearAll(){
+       return sharedPreferences.edit().clear().commit();
     }
 
 }

@@ -10,4 +10,13 @@
     <color name="text_background"></color>
     <color name="text_color">#fff</color>
     <color name="login_button">#dd4b39</color>
+
+    <color name="rv1">#F44336</color>
+    <color name="rv2">#3F51B5</color>
+    <color name="rv3">#9C27B0</color>
+    <color name="rv4">#FFC107</color>
+    <color name="rv5">#4CAF50</color>
+
+    <color name="score_color">#FFC107</color>
+
 </resources>

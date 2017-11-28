@@ -1,19 +1,46 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:animateLayoutChanges="true"
     android:orientation="vertical">
     <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_height="200dp"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        app:cardCornerRadius="0dp"
         app:cardBackgroundColor="#fff"
-        app:cardCornerRadius="6dp"
+        android:id="@+id/item_course_CV"
+        android:elevation="50dp"
         >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="A"
+                android:textSize="90dp"
+                android:id="@+id/item_course_big_letter"
+                android:layout_centerInParent="true"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:paddingLeft="3dp"
+                android:singleLine="true"
+                android:scrollHorizontally="true"
+                android:id="@+id/item_course_course_name"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:ellipsize="marquee"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:textSize="15dp"
+                android:textColor="#fff"
+                android:text="Lok Sewa Preparation for Kharidar"/>
+        </RelativeLayout>
 
     </android.support.v7.widget.CardView>
 

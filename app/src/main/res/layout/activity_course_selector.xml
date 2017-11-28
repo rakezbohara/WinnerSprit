@@ -5,29 +5,34 @@
     android:background="@color/colorPrimary"
     android:animateLayoutChanges="true"
     android:orientation="vertical"
-    tools:context="com.app.rakez.winnersprit.CourseSelector">
-
-    <StackView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/course_SV"
-        android:layout_marginTop="80dp"
-        android:layout_marginBottom="160dp">
-    </StackView>
-
-    <Button
+    tools:context="com.app.rakez.winnersprit.selection.CourseSelector">
+    <TextView
+        android:id="@+id/select_logo"
+        android:layout_marginTop="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="60dp"
-        android:background="@color/login_button"
-        android:textColor="@color/text_color"
-        android:id="@+id/next_button"
-        android:text="Proceed"
-        android:textAllCaps="true"
+        android:gravity="center"
+        android:text="LOGO"
+        android:textSize="30sp"
+        android:textStyle="bold"/>
+    <TextView
+        android:layout_below="@+id/select_logo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select the Course"
+        android:layout_marginBottom="15dp"
         android:textSize="20dp"
-        android:drawableRight="@drawable/ic_arrow_forward"
-        android:textAlignment="viewEnd"
-        android:padding="8dp"/>
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:id="@+id/select_course_TV"
+        android:textAlignment="center"
+        android:textColor="#fff"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@+id/select_course_TV"
+        android:layout_width="match_parent"
+        android:id="@+id/course_select_RV"
+        android:layout_height="wrap_content"/>
+
 
 </RelativeLayout>
