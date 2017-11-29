@@ -1,6 +1,7 @@
 package com.app.rakez.winnersprit.quiz;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.app.rakez.winnersprit.R;
+import com.app.rakez.winnersprit.question.QuestionActivity;
 
 import java.util.List;
 
@@ -77,6 +79,13 @@ public class AdapterLevel extends RecyclerView.Adapter<AdapterLevel.ViewHolder> 
             params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
         }
         holder.cardView.setLayoutParams(params);
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, QuestionActivity.class);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

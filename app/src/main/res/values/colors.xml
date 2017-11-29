@@ -23,4 +23,14 @@
     <color name="level_active">#dd4b39</color>
     <color name="level_inactive">#d6958d</color>
 
+    //questio color
+    <color name="light_black">#808080</color>
+    <color name="answer_true">#4CAF50</color>
+    <color name="answer_true_back">#414caf50</color>
+    <color name="answer_false">#F44336</color>
+    <color name="answer_false_back">#41f44336</color>
+    <color name="default_text_color">#808080</color>
+    <color name="transparent">#0033b5e5</color>
+    <color name="white">#fff</color>
+
 </resources>
