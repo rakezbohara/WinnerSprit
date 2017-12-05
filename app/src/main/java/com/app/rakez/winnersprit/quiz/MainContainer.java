@@ -25,9 +25,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.app.rakez.winnersprit.EntryPointActivity;
+import com.app.rakez.winnersprit.FirebaseHandler.FirebaseHelper;
 import com.app.rakez.winnersprit.R;
 import com.app.rakez.winnersprit.data.SharedPref;
 import com.app.rakez.winnersprit.util.ImageUtils;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -35,20 +39,36 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainContainer extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ToogleProfile {
+        implements NavigationView.OnNavigationItemSelectedListener, ActivityCommunicator, View.OnClickListener {
 
     private static String TAG = "Main Caontainer";
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.drawer_layout) DrawerLayout drawer;
     @BindView(R.id.nav_view) NavigationView navigationView;
+    View navHeaderView;
+    ImageView navImage;
+    TextView navName;
+    TextView navEmail;
 
     SharedPref sharedPref;
     ImageUtils imageUtils;
@@ -62,7 +82,7 @@ public class MainContainer extends AppCompatActivity
     @BindView(R.id.level_val_TV) TextView levelValueTV;
     @BindView(R.id.scoreboard_fab) FloatingActionButton scoreboardFAB;
     @BindView(R.id.theory_fab) FloatingActionButton theoryFAB;
-    String userName, courseName, uId, email, loginProvider;
+    String userName, courseId, courseName, uId, email, loginProvider;
     Bitmap userImage;
     boolean imageExist;
 
@@ -72,6 +92,8 @@ public class MainContainer extends AppCompatActivity
     //Fragment elements
     FragmentTransaction fragmentTransaction;
     LevelFragment levelFragment;
+
+    DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,29 +109,39 @@ public class MainContainer extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
-
+        navHeaderView = navigationView.inflateHeaderView(R.layout.nav_header_main_container);
+        navImage = navHeaderView.findViewById(R.id.nav_image);
+        navName = navHeaderView.findViewById(R.id.nav_name);
+        navEmail = navHeaderView.findViewById(R.id.nav_email);
         firebaseAuth = FirebaseAuth.getInstance();
         sharedPref = new SharedPref(this);
         imageUtils = new ImageUtils();
-
+        databaseReference = FirebaseHelper.getDatabase().getReference();
         levelFragment = new LevelFragment();
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, levelFragment);
         fragmentTransaction.commit();
         initializeUserProfile();
+        scoreboardFAB.setOnClickListener(this);
     }
 
     private void initializeUserProfile(){
         userName = sharedPref.getStringData("name");
         uId  =sharedPref.getStringData("uid");
         courseName = sharedPref.getStringData("course_name");
+        courseId = sharedPref.getStringData("course_id");
         email = sharedPref.getStringData("email");
         loginProvider = sharedPref.getStringData("login_provider");
         imageExist = sharedPref.getBooleanData("image_exist");
         if(imageExist){
             userImage = imageUtils.loadImageBitmap(this,uId);
             profileImage.setImageBitmap(userImage);
+            navImage.setImageBitmap(userImage);
+        }else{
+            navImage.setImageResource(R.drawable.ic_user_image);
         }
+        navName.setText(userName);
+        navEmail.setText(email);
         userNameTV.setText(userName);
         courseNameTV.setText(courseName);
     }
@@ -159,7 +191,7 @@ public class MainContainer extends AppCompatActivity
 
         } else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_faq) {
 
         } else if (id == R.id.nav_send) {
 
@@ -227,7 +259,7 @@ public class MainContainer extends AppCompatActivity
         if(profileLayout.getVisibility()==View.VISIBLE){
             profileLayout.animate()
                     .alpha(0.0f)
-                    .setDuration(1000)
+                    .setDuration(500)
                     .setListener(new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {
@@ -241,11 +273,10 @@ public class MainContainer extends AppCompatActivity
 
     @Override
     public void showProfile() {
-
         if(profileLayout.getVisibility()==View.GONE){
             profileLayout.animate()
                     .alpha(1.0f)
-                    .setDuration(1000)
+                    .setDuration(500)
                     .setListener(new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {
@@ -259,6 +290,86 @@ public class MainContainer extends AppCompatActivity
                             }
                         }
                     });
+        }
+    }
+
+    @Override
+    public void updateScoreandLevel(Integer obtainedscore,Integer totalScore, Integer level) {
+        scoreValueTV.setText(obtainedscore+"/"+totalScore);
+        levelValueTV.setText(String.valueOf(level));
+        sharedPref.saveData("obtained_score",obtainedscore);
+        sharedPref.saveData("total_score", totalScore);
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        switch (id){
+            case R.id.scoreboard_fab:
+                showScorecard();
+                break;
+            case R.id.theory_fab:
+                break;
+            default:
+                break;
+
+        }
+    }
+
+    public void showScorecard(){
+        AccessToken token = AccessToken.getCurrentAccessToken();
+        if(!token.getPermissions().contains("publish_actions")){
+            LoginManager manager = LoginManager.getInstance();
+            manager.logInWithPublishPermissions(this, Arrays.asList("publish_actions"));
+        }
+        GraphRequest graphRequest = GraphRequest.newGraphPathRequest(token, "/"+getResources().getString(R.string.facebook_app_id)+"/scores", new GraphRequest.Callback() {
+            @Override
+            public void onCompleted(GraphResponse response) {
+                Log.d(TAG, response.toString());
+                if(response.getError()==null) {
+                    handleResponse(response);
+                    try {
+                        Log.d(TAG, response.getJSONObject().getJSONArray("data").toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Log.d(TAG, e.getLocalizedMessage());
+                    }
+                }
+            }
+        });
+        graphRequest.executeAsync();
+    }
+
+    private void handleResponse(GraphResponse response) {
+        try {
+            AccessToken token = AccessToken.getCurrentAccessToken();
+            JSONArray topScoreData = response.getJSONObject().getJSONArray("data");
+            for(int i = 0 ; i < topScoreData.length() ; i++){
+                JSONObject userData = topScoreData.getJSONObject(i);
+                String itemUserId = userData.getJSONObject("user").getString("id");
+                Log.d(TAG, itemUserId);
+                Log.d(TAG, itemUserId);
+                GraphRequest request = GraphRequest.newGraphPathRequest(
+                        token,
+                        "/"+itemUserId+"/picture?redirect=false",
+                        new GraphRequest.Callback() {
+                            @Override
+                            public void onCompleted(GraphResponse response) {
+                                if(response.getError()==null){
+                                    try {
+                                        Log.d(TAG, response.getJSONObject().getJSONObject("data").getString("url"));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        });
+
+                request.executeAsync();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }

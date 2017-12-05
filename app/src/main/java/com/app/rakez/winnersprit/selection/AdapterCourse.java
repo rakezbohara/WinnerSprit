@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.app.rakez.winnersprit.R;
 import com.app.rakez.winnersprit.data.SharedPref;
+import com.app.rakez.winnersprit.model.Course;
 import com.app.rakez.winnersprit.quiz.MainContainer;
 
 import java.util.List;
@@ -25,10 +26,10 @@ import butterknife.ButterKnife;
 public class AdapterCourse extends RecyclerView.Adapter<AdapterCourse.MyViewHolder> {
 
     private Context context;
-    private List<ItemCourse> itemCourses;
+    private List<Course> itemCourses;
     SharedPref sharedPref;
 
-    public AdapterCourse(Context context, List<ItemCourse> itemCourses) {
+    public AdapterCourse(Context context, List<Course> itemCourses) {
         this.context = context;
         this.itemCourses = itemCourses;
         sharedPref = new SharedPref(context);
@@ -42,9 +43,9 @@ public class AdapterCourse extends RecyclerView.Adapter<AdapterCourse.MyViewHold
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        final ItemCourse itemCourse  =itemCourses.get(position);
-        holder.bigLetterTV.setText(itemCourse.getCourseName().substring(0,1));
-        holder.courseName.setText(itemCourse.getCourseName());
+        final Course itemCourse  =itemCourses.get(position);
+        holder.bigLetterTV.setText(itemCourse.getName().substring(0,1));
+        holder.courseName.setText(itemCourse.getName());
         holder.courseName.setSelected(true);
         if (position%5==0){
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.rv1));
@@ -60,8 +61,8 @@ public class AdapterCourse extends RecyclerView.Adapter<AdapterCourse.MyViewHold
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sharedPref.saveData("course_id",itemCourse.getCourseId());
-                sharedPref.saveData("course_name",itemCourse.getCourseName());
+                sharedPref.saveData("course_id",itemCourse.getId());
+                sharedPref.saveData("course_name",itemCourse.getName());
                 Intent in = new Intent(context, MainContainer.class);
                 context.startActivity(in);
                 ((CourseSelector)context).finish();

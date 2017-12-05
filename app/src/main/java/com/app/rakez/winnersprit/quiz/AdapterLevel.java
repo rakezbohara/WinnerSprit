@@ -26,10 +26,12 @@ public class AdapterLevel extends RecyclerView.Adapter<AdapterLevel.ViewHolder> 
 
     private Context context;
     private List<ItemLevel> itemLevels;
+    private Integer currentLevel;
 
-    public AdapterLevel(Context context, List<ItemLevel> itemLevels) {
+    public AdapterLevel(Context context, List<ItemLevel> itemLevels, Integer currentLevel) {
         this.context = context;
         this.itemLevels = itemLevels;
+        this.currentLevel = currentLevel;
     }
 
     @Override
@@ -39,7 +41,7 @@ public class AdapterLevel extends RecyclerView.Adapter<AdapterLevel.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder,final int position) {
         final ItemLevel itemLevel = itemLevels.get(position);
         if(itemLevel.isActive()){
             holder.cardView.setCardBackgroundColor(context.getResources().getColor(R.color.level_active));
@@ -82,12 +84,19 @@ public class AdapterLevel extends RecyclerView.Adapter<AdapterLevel.ViewHolder> 
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, QuestionActivity.class);
-                context.startActivity(intent);
+                if(itemLevel.isActive()){
+                    Intent intent = new Intent(context, QuestionActivity.class);
+                    intent.putExtra("level",position);
+                    if(position<currentLevel){
+                        intent.putExtra("is_completed", true);
+                    }else{
+                        intent.putExtra("is_completed", false);
+                    }
+                    context.startActivity(intent);
+                }
             }
         });
     }
-
     @Override
     public int getItemCount() {
         return itemLevels.size();

@@ -74,7 +74,9 @@
             android:padding="@dimen/qa_padding"
             android:text="This is sample question"
             android:scrollbars="vertical"
-            android:textSize="18dp"
+            android:textSize="15dp"
+            android:justificationMode="inter_word"
+            android:textStyle="bold"
             android:layout_below="@+id/question_no_RV"
             android:id="@+id/question_TV"/>
         <android.support.v7.widget.RecyclerView
@@ -108,6 +110,26 @@
                 android:layout_height="match_parent"
                 android:layout_toLeftOf="@+id/question_next"
                 android:id="@+id/divider_next"
+                android:background="#fff"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="PREVIOUS"
+                android:layout_alignParentLeft="true"
+                android:gravity="center_vertical"
+                android:textStyle="bold"
+                android:clickable="true"
+                android:paddingRight="16dp"
+                android:paddingLeft="16dp"
+                android:textColor="#fff"
+                android:visibility="gone"
+                android:id="@+id/question_previous"/>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:layout_toRightOf="@+id/question_previous"
+                android:id="@+id/divider_previous"
                 android:background="#fff"/>
         </RelativeLayout>
     </RelativeLayout>

@@ -6,6 +6,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaCas;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -130,7 +131,7 @@ public class EntryPointActivity extends AppCompatActivity implements View.OnClic
         emailRegisterLayout.setVisibility(View.GONE);
 
         mCallbackManager = CallbackManager.Factory.create();
-        fblogin.setReadPermissions("email", "public_profile");
+        fblogin.setReadPermissions("email", "public_profile" ,"user_friends");
         fblogin.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -158,8 +159,6 @@ public class EntryPointActivity extends AppCompatActivity implements View.OnClic
         login_fb.setOnClickListener(this);
         loginButton.setOnClickListener(this);
         registerButton.setOnClickListener(this);
-
-
     }
 
     @Override

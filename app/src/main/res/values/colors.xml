@@ -33,4 +33,7 @@
     <color name="transparent">#0033b5e5</color>
     <color name="white">#fff</color>
 
+
+    <color name="middle_color">#016158</color>
+    <color name="top_color">#012d27</color>
 </resources>
