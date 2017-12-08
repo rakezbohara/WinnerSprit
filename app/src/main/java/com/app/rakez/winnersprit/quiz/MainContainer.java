@@ -2,17 +2,24 @@ package com.app.rakez.winnersprit.quiz;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -20,18 +27,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.app.rakez.winnersprit.EntryPointActivity;
 import com.app.rakez.winnersprit.FirebaseHandler.FirebaseHelper;
 import com.app.rakez.winnersprit.R;
 import com.app.rakez.winnersprit.data.SharedPref;
+import com.app.rakez.winnersprit.model.LeaderBoard;
 import com.app.rakez.winnersprit.util.ImageUtils;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.Profile;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -52,7 +64,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -95,6 +110,13 @@ public class MainContainer extends AppCompatActivity
 
     DatabaseReference databaseReference;
 
+    //LeaderBpeard Component
+    Dialog leaderDialog;
+    RecyclerView dialogLeaderRV;
+    Button dialogLeaderDone;
+    List<LeaderBoard> listLeaderBoard;
+    AdapterLeader adapterLeader;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,6 +145,7 @@ public class MainContainer extends AppCompatActivity
         fragmentTransaction.commit();
         initializeUserProfile();
         scoreboardFAB.setOnClickListener(this);
+        theoryFAB.setOnClickListener(this);
     }
 
     private void initializeUserProfile(){
@@ -299,6 +322,7 @@ public class MainContainer extends AppCompatActivity
         levelValueTV.setText(String.valueOf(level));
         sharedPref.saveData("obtained_score",obtainedscore);
         sharedPref.saveData("total_score", totalScore);
+        updateScoreFB(obtainedscore);
     }
 
 
@@ -307,69 +331,172 @@ public class MainContainer extends AppCompatActivity
         int id = view.getId();
         switch (id){
             case R.id.scoreboard_fab:
-                showScorecard();
+                if(sharedPref.getStringData("login_provider").equals("facebook")){
+                    showScorecardFB();
+                }else{
+                    showError("Please Login using Facebook");
+                }
                 break;
             case R.id.theory_fab:
+                //Crashlytics.getInstance().crash();
                 break;
+            case R.id.leader_okay:
+                if(leaderDialog.isShowing()){
+                    leaderDialog.dismiss();
+                }
+
             default:
                 break;
 
         }
     }
 
-    public void showScorecard(){
-        AccessToken token = AccessToken.getCurrentAccessToken();
-        if(!token.getPermissions().contains("publish_actions")){
-            LoginManager manager = LoginManager.getInstance();
-            manager.logInWithPublishPermissions(this, Arrays.asList("publish_actions"));
-        }
-        GraphRequest graphRequest = GraphRequest.newGraphPathRequest(token, "/"+getResources().getString(R.string.facebook_app_id)+"/scores", new GraphRequest.Callback() {
-            @Override
-            public void onCompleted(GraphResponse response) {
-                Log.d(TAG, response.toString());
-                if(response.getError()==null) {
-                    handleResponse(response);
-                    try {
-                        Log.d(TAG, response.getJSONObject().getJSONArray("data").toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Log.d(TAG, e.getLocalizedMessage());
+    //Facebook Score task start here
+    public void showScorecardFB(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if(networkInfo != null && networkInfo.isConnected())
+        {
+            AccessToken token = AccessToken.getCurrentAccessToken();
+            if(!token.getPermissions().contains("publish_actions")){
+                LoginManager manager = LoginManager.getInstance();
+                manager.logInWithPublishPermissions(this, Arrays.asList("publish_actions"));
+            }
+            GraphRequest graphRequest = GraphRequest.newGraphPathRequest(token, "/"+getResources().getString(R.string.facebook_app_id)+"/scores", new GraphRequest.Callback() {
+                @Override
+                public void onCompleted(GraphResponse response) {
+                    Log.d(TAG, response.toString());
+                    if(response.getError()==null) {
+                        handleResponseFB(response);
+                        try {
+                            Log.d(TAG, response.getJSONObject().getJSONArray("data").toString());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.d(TAG, e.getLocalizedMessage());
+                        }
                     }
                 }
-            }
-        });
-        graphRequest.executeAsync();
+            });
+            graphRequest.executeAsync();
+        }
+        else
+        {
+            showError("Please check the internet connectivity");
+        }
     }
 
-    private void handleResponse(GraphResponse response) {
+    private void handleResponseFB(GraphResponse response) {
         try {
+            listLeaderBoard = new ArrayList<>();
             AccessToken token = AccessToken.getCurrentAccessToken();
-            JSONArray topScoreData = response.getJSONObject().getJSONArray("data");
+            if(!token.getPermissions().contains("publish_actions")){
+                LoginManager manager = LoginManager.getInstance();
+                manager.logInWithPublishPermissions(this, Arrays.asList("publish_actions"));
+            }
+            final JSONArray topScoreData = response.getJSONObject().getJSONArray("data");
+            showLeaderBoardDialog();
+            final LinkedHashMap<String,String> leaderNames = new LinkedHashMap<>();
+            final LinkedHashMap<String,String> leaderPhotoURLs = new LinkedHashMap<>();
+            final LinkedHashMap<String,String> leaderScores = new LinkedHashMap<>();
             for(int i = 0 ; i < topScoreData.length() ; i++){
                 JSONObject userData = topScoreData.getJSONObject(i);
-                String itemUserId = userData.getJSONObject("user").getString("id");
+                leaderNames.put(userData.getJSONObject("user").getString("id"),userData.getJSONObject("user").getString("name"));
+                leaderScores.put(userData.getJSONObject("user").getString("id"),userData.getString("score"));
+                final String itemUserId = userData.getJSONObject("user").getString("id");
                 Log.d(TAG, itemUserId);
-                Log.d(TAG, itemUserId);
+                Log.d(TAG,"Total Len"+topScoreData.length());
                 GraphRequest request = GraphRequest.newGraphPathRequest(
                         token,
-                        "/"+itemUserId+"/picture?redirect=false",
+                        "/"+itemUserId+"?fields=id,picture,name&redirect=false",
                         new GraphRequest.Callback() {
                             @Override
                             public void onCompleted(GraphResponse response) {
+                                Log.e(TAG,"Response error "+response.toString());
                                 if(response.getError()==null){
                                     try {
-                                        Log.d(TAG, response.getJSONObject().getJSONObject("data").getString("url"));
+                                        leaderPhotoURLs.put(response.getJSONObject().getString("id"),response.getJSONObject().getJSONObject("picture").getJSONObject("data").getString("url"));
+                                        //Log.d(TAG, response.getJSONObject().getJSONObject("data").getString("url"));
                                     } catch (JSONException e) {
                                         e.printStackTrace();
+                                        Log.e(TAG,"Photo error "+e.getLocalizedMessage());
                                     }
+                                }else{
+                                }
+                                //Log.d(TAG,"Photo Len"+leaderPhotoURLs.size()+isLast);
+                                if(leaderPhotoURLs.size()==topScoreData.length()){
+                                    Log.d(TAG,"Name Len"+leaderNames.size());
+                                    Log.d(TAG,"Photo Len"+leaderPhotoURLs.size());
+                                    Log.d(TAG,"Score Len"+leaderScores.size());
+                                    adapterLeader.updateData(leaderNames, leaderPhotoURLs, leaderScores);
                                 }
                             }
                         });
-
                 request.executeAsync();
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
+    public void updateScoreFB(Integer currentScore){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if(networkInfo != null && networkInfo.isConnected())
+        {
+            AccessToken token = AccessToken.getCurrentAccessToken();
+            if(!token.getPermissions().contains("publish_actions")){
+                LoginManager manager = LoginManager.getInstance();
+                manager.logInWithPublishPermissions(this, Arrays.asList("publish_actions"));
+            }
+            JSONObject object = new JSONObject();
+            try {
+                object.put("score", currentScore);
+            } catch (JSONException e) {
+                Log.w(TAG, "Error publishing score to Facebook");
+            }
+            GraphRequest graphRequest = GraphRequest.newPostRequest(token, "me/scores", object, new GraphRequest.Callback() {
+                @Override
+                public void onCompleted(GraphResponse response) {
+                    Log.d(TAG, response.toString());
+                }
+            });
+            graphRequest.executeAsync();
+        }
+        else
+        {
+            showError("Please check the internet connectivity");
+        }
+
+    }
+    //Facebook Score task start here
+
+    //Leaderboard Dialog
+    public void showLeaderBoardDialog(){
+        leaderDialog = new Dialog(this);
+        leaderDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        leaderDialog.setContentView(R.layout.dialog_leaderboard);
+        dialogLeaderRV = leaderDialog.findViewById(R.id.leader_RV);
+        dialogLeaderDone = leaderDialog.findViewById(R.id.leader_okay);
+        adapterLeader = new AdapterLeader(this, listLeaderBoard);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
+        dialogLeaderRV.setLayoutManager(layoutManager);
+        dialogLeaderRV.setAdapter(adapterLeader);
+        leaderDialog.show();
+        dialogLeaderDone.setOnClickListener(this);
+    }
+
+    void showError(String error){
+        final Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), error, Snackbar.LENGTH_INDEFINITE);
+        snackbar.setAction("OKAY", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                snackbar.dismiss();
+            }
+        });
+        snackbar.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+        snackbar.show();
+        Log.d(TAG, "Error : "+error);
+    }
+
+
 }

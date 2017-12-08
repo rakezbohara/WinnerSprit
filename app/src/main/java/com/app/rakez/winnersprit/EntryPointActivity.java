@@ -52,6 +52,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -109,6 +110,7 @@ public class EntryPointActivity extends AppCompatActivity implements View.OnClic
         setContentView(R.layout.activity_entry_point);
         ButterKnife.bind(this);
         pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Please wait...");
         imageUtils = new ImageUtils();
         sharedPref = new SharedPref(this);
         //auth starts
