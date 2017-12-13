@@ -1,5 +1,7 @@
 package com.app.rakez.winnersprit.model;
 
+import com.google.firebase.database.PropertyName;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +28,11 @@ public class Question {
         this.answers = new ArrayList<String>(answers.values());
     }
 
-    public String getQuestionId() {
+    public String getQuestion_id() {
         return question_id;
     }
 
-    public void setQuestionId(String question_id) {
+    public void setQuestion_id(String question_id) {
         this.question_id = question_id;
     }
 

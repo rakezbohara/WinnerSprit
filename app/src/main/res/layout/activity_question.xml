@@ -34,6 +34,14 @@
                 android:layout_toRightOf="@+id/question_exit"
                 android:id="@+id/divider_exit"
                 android:background="#fff"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Level 5"
+                android:id="@+id/quiz_level"
+                android:textColor="@color/white"
+                android:gravity="center_vertical"
+                android:layout_centerHorizontal="true"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

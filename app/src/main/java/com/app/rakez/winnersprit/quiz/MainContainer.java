@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import com.app.rakez.winnersprit.FirebaseHandler.FirebaseHelper;
 import com.app.rakez.winnersprit.R;
 import com.app.rakez.winnersprit.data.SharedPref;
 import com.app.rakez.winnersprit.model.LeaderBoard;
+import com.app.rakez.winnersprit.selection.CourseSelector;
 import com.app.rakez.winnersprit.util.ImageUtils;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.AccessToken;
@@ -106,7 +108,6 @@ public class MainContainer extends AppCompatActivity
 
     //Fragment elements
     FragmentTransaction fragmentTransaction;
-    LevelFragment levelFragment;
 
     DatabaseReference databaseReference;
 
@@ -131,6 +132,7 @@ public class MainContainer extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setCheckedItem(R.id.nav_quiz);
         navHeaderView = navigationView.inflateHeaderView(R.layout.nav_header_main_container);
         navImage = navHeaderView.findViewById(R.id.nav_image);
         navName = navHeaderView.findViewById(R.id.nav_name);
@@ -139,13 +141,15 @@ public class MainContainer extends AppCompatActivity
         sharedPref = new SharedPref(this);
         imageUtils = new ImageUtils();
         databaseReference = FirebaseHelper.getDatabase().getReference();
-        levelFragment = new LevelFragment();
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, levelFragment);
+        fragmentTransaction.replace(R.id.fragment_container, LevelFragment.getInstance());
         fragmentTransaction.commit();
         initializeUserProfile();
         scoreboardFAB.setOnClickListener(this);
         theoryFAB.setOnClickListener(this);
+        //Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/unicode.ttf");
+        //courseNameTV.setTypeface(custom_font);
+        //userNameTV.setTypeface(custom_font);
     }
 
     private void initializeUserProfile(){
@@ -156,6 +160,8 @@ public class MainContainer extends AppCompatActivity
         email = sharedPref.getStringData("email");
         loginProvider = sharedPref.getStringData("login_provider");
         imageExist = sharedPref.getBooleanData("image_exist");
+        Log.d(TAG,"course id "+courseId);
+        Log.d(TAG,"course id "+courseName);
         if(imageExist){
             userImage = imageUtils.loadImageBitmap(this,uId);
             profileImage.setImageBitmap(userImage);
@@ -163,8 +169,9 @@ public class MainContainer extends AppCompatActivity
         }else{
             navImage.setImageResource(R.drawable.ic_user_image);
         }
-        navName.setText(userName);
         navEmail.setText(email);
+        navName.setText(userName);
+
         userNameTV.setText(userName);
         courseNameTV.setText(courseName);
     }
@@ -205,22 +212,34 @@ public class MainContainer extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_faq) {
-
-        } else if (id == R.id.nav_send) {
-
-        } else if (id == R.id.nav_logout){
-            signOut();
-        }
+         switch (id){
+             case R.id.nav_bookmark:
+                 fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                 fragmentTransaction.replace(R.id.fragment_container, BookmarkFragment.getInstance());
+                 fragmentTransaction.commit();
+                 break;
+             case R.id.nav_logout:
+                 signOut();
+                 break;
+             case R.id.nav_quiz:
+                 fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                 fragmentTransaction.replace(R.id.fragment_container, LevelFragment.getInstance());
+                 fragmentTransaction.commit();
+                 break;
+             case R.id.nav_leaderboard:
+                 if(sharedPref.getStringData("login_provider").equals("facebook")){
+                     showScorecardFB();
+                 }else{
+                     showError("Please Login using Facebook");
+                 }
+                 break;
+             case R.id.nav_switch_course:
+                 Intent intent = new Intent(this, CourseSelector.class);
+                 startActivity(intent);
+                 finish();
+             default:
+                 break;
+         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -344,11 +363,16 @@ public class MainContainer extends AppCompatActivity
                 if(leaderDialog.isShowing()){
                     leaderDialog.dismiss();
                 }
-
             default:
                 break;
 
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        LevelFragment.levelFragment = null;
+        super.onDestroy();
     }
 
     //Facebook Score task start here

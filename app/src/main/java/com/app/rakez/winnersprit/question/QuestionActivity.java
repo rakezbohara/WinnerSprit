@@ -3,6 +3,8 @@ package com.app.rakez.winnersprit.question;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,10 +22,18 @@ import android.widget.Toast;
 
 import com.app.rakez.winnersprit.FirebaseHandler.FirebaseHelper;
 import com.app.rakez.winnersprit.R;
+import com.app.rakez.winnersprit.SugarModel.Questions;
 import com.app.rakez.winnersprit.data.DataRepository;
 import com.app.rakez.winnersprit.data.SharedPref;
 import com.app.rakez.winnersprit.model.Question;
 import com.app.rakez.winnersprit.quiz.MainContainer;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareHashtag;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,6 +63,7 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
     @BindView(R.id.question_next) TextView nextQuestionTV;
     @BindView(R.id.question_previous) TextView previousQuestionTV;
     @BindView(R.id.divider_previous) View dividerPrevious;
+    @BindView(R.id.quiz_level) TextView levelTV;
 
     //Dialog componenets
     TextView dialogScoreTV;
@@ -61,6 +72,9 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
     Button dialogReviewButton;
     Button dialogRetryButton;
     Button dialogNextLevelButton;
+    Button dialogShareFB;
+    ShareDialog shareDialog;
+    CallbackManager callbackManager;
 
     DataRepository dataRepository;
 
@@ -76,6 +90,7 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
     String currentQuestionId;
     SharedPref sharedPref;
     String courseId;
+    String courseName;
     String userId;
     Integer obtainedScore;
     Integer totalScore;
@@ -115,6 +130,9 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
         nextQuestionTV.setOnClickListener(this);
         previousQuestionTV.setOnClickListener(this);
         exitTV.setOnClickListener(this);
+        bookmarkQuestion.setOnClickListener(this);
+        //Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/unicode.ttf");
+        //questionTV.setTypeface(custom_font);
     }
     private void initialize() {
         //dataRepository = DataRepository.getInstance();
@@ -127,9 +145,11 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
         answerTimeList = new ArrayList<>();
         sharedPref = new SharedPref(this);
         courseId = sharedPref.getStringData("course_id");
+        courseName = sharedPref.getStringData("course_name");
         userId = sharedPref.getStringData("uid");
         obtainedScore = sharedPref.getIntData("obtained_score");
         totalScore = sharedPref.getIntData("total_score");
+        levelTV.setText("Level : "+currentLevel);
         databaseReference = FirebaseHelper.getDatabase().getReference();
         countDownTimer = new CountDownTimer(30000,1000) {
             @Override
@@ -175,9 +195,7 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
         Intent intent;
         switch (id){
             case R.id.question_exit:
-                intent = new Intent(this, MainContainer.class);
-                startActivity(intent);
-                finish();
+                onBackPressed();
                 break;
             case R.id.question_next:
                 nextQuestion();
@@ -185,7 +203,9 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
             case R.id.question_previous:
                 previousQuestion();
                 break;
-            //other case
+            case R.id.question_bookmark:
+                saveQuestionBookmark();
+                break;
             case R.id.result_retry:
                 if(resultDialog.isShowing()){
                     resultDialog.dismiss();
@@ -200,12 +220,41 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
                 break;
             case R.id.result_next_level:
                 intent = new Intent(this, MainContainer.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
+                finish();
+            case R.id.dialog_share_to_fb:
+                shareToFB();
                 finish();
             default:
                 break;
         }
     }
+
+
+
+    private void saveQuestionBookmark() {
+        //Questions.deleteAll(Questions.class);
+        if(!questionExist(questionId.get(currentQuestionNo))){
+            Questions questions = new Questions(questionId.get(currentQuestionNo), questionList.get(currentQuestionNo), String.valueOf(correctAnswer.get(currentQuestionNo)),String.valueOf(currentLevel), answersList.get(currentQuestionNo).get(0),answersList.get(currentQuestionNo).get(1),answersList.get(currentQuestionNo).get(2),answersList.get(currentQuestionNo).get(3));
+            questions.save();
+            Toast.makeText(this, "Question successfully bookmarked", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "Question already bookmarked", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private boolean questionExist(String questionId){
+        Log.d(TAG, "question id is "+questionId);
+        List<Questions> questions = Questions.find(Questions.class, "questionid = ?", questionId);
+        if(questions.size()>0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 
     private void reviewAnswers() {
         isReview = true;
@@ -305,10 +354,11 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
         dialogReviewButton = resultDialog.findViewById(R.id.result_review);
         dialogRetryButton = resultDialog.findViewById(R.id.result_retry);
         dialogNextLevelButton = resultDialog.findViewById(R.id.result_next_level);
+        dialogShareFB = resultDialog.findViewById(R.id.dialog_share_to_fb);
 
         //setting values
         dialogScoreTV.setText(correctAnswered+"/20");
-        dialogSkippedTV.setText(skippedAnsweres+" skipped");
+        dialogSkippedTV.setText("("+skippedAnsweres+" skipped"+")");
         if(avgTime<10){
             dialogAvgTimeTV.setText("00:0"+avgTime+" sec");
         }else{
@@ -320,13 +370,16 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
             }
             dialogNextLevelButton.setVisibility(View.VISIBLE);
             dialogRetryButton.setVisibility(View.GONE);
+            dialogShareFB.setVisibility(View.VISIBLE);
         }else {
             dialogNextLevelButton.setVisibility(View.GONE);
             dialogRetryButton.setVisibility(View.VISIBLE);
+            dialogShareFB.setVisibility(View.GONE);
         }
         dialogReviewButton.setOnClickListener(this);
         dialogRetryButton.setOnClickListener(this);
         dialogNextLevelButton.setOnClickListener(this);
+        dialogShareFB.setOnClickListener(this);
         resultDialog.show();
     }
 
@@ -365,7 +418,7 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
     public void initializeLevelData(List<Question> currentQuestionList){
         Collections.shuffle(currentQuestionList);
         for(int i = 0 ; i < 20 ; i++){
-            questionId.add(currentQuestionList.get(i).getQuestionId());
+            questionId.add(currentQuestionList.get(i).getQuestion_id());
             questionList.add(currentQuestionList.get(i).getQuestion());
             answersList.add(currentQuestionList.get(i).getAnswers());
             correctAnswer.add(Integer.parseInt(currentQuestionList.get(i).getCorrect()));
@@ -381,7 +434,7 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
         databaseReference.updateChildren(updateData);
     }
 
-    public void updateScore(Integer score){
+    /*public void updateScore(Integer score){
         totalScore = totalScore + 20;
         obtainedScore = obtainedScore+score;
         databaseReference = FirebaseHelper.getDatabase().getReference();
@@ -398,5 +451,64 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
                 }
             }
         });
+    }*/
+    public void updateScore(Integer score){
+        totalScore = totalScore + 20;
+        obtainedScore = obtainedScore+score;
+        databaseReference = FirebaseHelper.getDatabase().getReference();
+        Map<String, Object> updateData = new HashMap<>();
+        updateData.put("/scores/"+userId+"/obtained_score",String.valueOf(obtainedScore));
+        updateData.put("/scores/"+userId+"/total_score",String.valueOf(totalScore));
+        databaseReference.updateChildren(updateData, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if(databaseError!=null){
+                    Log.d(TAG, "Event Occured "+databaseError.getMessage());
+                }else{
+                    Log.d(TAG, "Event Occured success "+" scores/"+userId+"/"+courseId);
+                }
+            }
+        });
     }
+
+    public void shareToFB(){
+        shareDialog = new ShareDialog(this);
+        // this part is optional
+        callbackManager = CallbackManager.Factory.create();
+        shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+            @Override
+            public void onSuccess(Sharer.Result result) {
+                Log.d(TAG, result.toString());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d(TAG, "Cancelled");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d(TAG, error.getLocalizedMessage());
+            }});
+        if (ShareDialog.canShow(ShareLinkContent.class)) {
+            ShareHashtag hashTag = new ShareHashtag.Builder()
+                    .setHashtag("#PlayAndLearn #EPN #ExamPreparationNepal")
+                    .build();
+            ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                    .setContentUrl(Uri.parse("http://developers.facebook.com/android"))
+                    .setQuote("I have completed level "+(currentLevel+1)+" Level for "+courseName)
+                    .setShareHashtag(hashTag)
+                    .build();
+            shareDialog.show(linkContent);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (resultDialog != null && resultDialog.isShowing()) {
+            resultDialog.dismiss();
+        }
+        super.onPause();
+    }
+
 }

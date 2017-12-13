@@ -1,6 +1,7 @@
 package com.app.rakez.winnersprit.question;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -86,6 +87,8 @@ public class AdapterAnswer extends RecyclerView.Adapter<AdapterAnswer.ViewHolder
             super(itemView);
             ButterKnife.bind(this, itemView);
             view = itemView;
+            //Typeface custom_font = Typeface.createFromAsset(context.getAssets(),  "fonts/unicode.ttf");
+            //answerOption.setTypeface(custom_font);
         }
     }
 

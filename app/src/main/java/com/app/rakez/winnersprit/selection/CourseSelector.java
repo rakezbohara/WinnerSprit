@@ -6,6 +6,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -32,9 +33,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class CourseSelector extends AppCompatActivity {
+public class CourseSelector extends AppCompatActivity implements View.OnClickListener {
 
     @BindView(R.id.course_select_RV)RecyclerView courseSelectRV;
+    @BindView(R.id.course_next) Button courseNext;
     List<Course> itemCourses;
     AdapterCourse adapterCourse;
     ProgressDialog progressDialog;
@@ -50,6 +52,8 @@ public class CourseSelector extends AppCompatActivity {
         ButterKnife.bind(this);
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading Courses");
+        courseNext.setEnabled(false);
+        courseNext.setOnClickListener(this);
         initializeRV();
         getCourses();
 
@@ -58,7 +62,7 @@ public class CourseSelector extends AppCompatActivity {
     private void initializeRV() {
         itemCourses = new ArrayList<>();
         adapterCourse = new AdapterCourse(this, itemCourses);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this,2);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         courseSelectRV.setLayoutManager(layoutManager);
         courseSelectRV.setAdapter(adapterCourse);
     }
@@ -103,4 +107,23 @@ public class CourseSelector extends AppCompatActivity {
         });
     }
 
+    public void enableNext(boolean enable){
+        if(enable){
+            courseNext.setEnabled(true);
+        }else{
+            courseNext.setEnabled(false);
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        switch (id){
+            case R.id.course_next:
+                adapterCourse.nextCourse();
+                break;
+            default:
+                break;
+        }
+    }
 }

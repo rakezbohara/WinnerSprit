@@ -52,7 +52,13 @@ public class LevelFragment extends Fragment {
     ActivityCommunicator activityCommunicator;
 
     DatabaseReference databaseReference;
-
+    static LevelFragment levelFragment;
+    public static LevelFragment getInstance(){
+        if(levelFragment==null){
+            levelFragment = new LevelFragment();
+        }
+        return levelFragment;
+    }
     public LevelFragment() {
 
     }
@@ -84,6 +90,11 @@ public class LevelFragment extends Fragment {
             throw new ClassCastException(activity.toString()
                     + " must implement OnHeadlineSelectedListener");
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 
     private void initializeRV() {
@@ -138,12 +149,37 @@ public class LevelFragment extends Fragment {
         });
     }
 
-    public void updateCurrentLevel(){
+    /*public void updateCurrentLevel(){
         databaseReference.child("scores/"+userId+"/"+courseId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.child("level").getValue(String.class)!=null){
                     currentLevel = Integer.valueOf(dataSnapshot.child("level").getValue(String.class));
+                }
+                if(dataSnapshot.child("obtained_score").getValue(String.class)!=null){
+                    currentObtainedScore = Integer.valueOf(dataSnapshot.child("obtained_score").getValue(String.class));
+                }
+                if(dataSnapshot.child("total_score").getValue(String.class)!=null){
+                    currentTotalScore = Integer.valueOf(dataSnapshot.child("total_score").getValue(String.class));
+                }
+                Log.d("From fragment", "data is "+currentLevel+":"+currentObtainedScore);
+                initializeRV();
+                activityCommunicator.updateScoreandLevel(currentObtainedScore,currentTotalScore,currentLevel);
+                loadPrimaryLevel();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }*/
+    public void updateCurrentLevel(){
+        Log.d("from fragment","course id b "+courseId);
+        databaseReference.child("scores/"+userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child(courseId+"/level").getValue(String.class)!=null){
+                    currentLevel = Integer.valueOf(dataSnapshot.child(courseId+"/level").getValue(String.class));
                 }
                 if(dataSnapshot.child("obtained_score").getValue(String.class)!=null){
                     currentObtainedScore = Integer.valueOf(dataSnapshot.child("obtained_score").getValue(String.class));
@@ -187,4 +223,6 @@ public class LevelFragment extends Fragment {
             });
         }
     }
+
+
 }
