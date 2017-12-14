@@ -152,15 +152,16 @@ public class BookmarkQuestion extends AppCompatActivity implements View.OnClickL
     private void deleteCurrentItem() {
         Questions questions = questionsList.get(currentQuestionNo);
         questions.delete();
-        Log.d("Bookmark fragment", "Size is a : "+questionsList.get(currentQuestionNo).getQuestion_id());
-        Log.d("Bookmark fragment", "Size is a : "+questionsList.size());
         questionsList = Questions.listAll(Questions.class);
-        Log.d("Bookmark fragment", "Size is b : "+questionsList.get(currentQuestionNo).getQuestion_id());
-        Log.d("Bookmark fragment", "Size is b : "+questionsList.size());
         Toast.makeText(this, "Question deleted...", Toast.LENGTH_SHORT).show();
-        if(questionsList.isEmpty()){
+        if(questionsList.size()==0){
             onBackPressed();
+        }else if(currentQuestionNo==questionsList.size()){
+            currentQuestionNo--;
+            initializeQuestion(questionsList.get(currentQuestionNo).getQuestion(), getAnswersList(), questionsList.get(currentQuestionNo).getCorrect());
+        }else{
+            initializeQuestion(questionsList.get(currentQuestionNo).getQuestion(), getAnswersList(), questionsList.get(currentQuestionNo).getCorrect());
         }
-        initializeQuestion(questionsList.get(currentQuestionNo).getQuestion(), getAnswersList(), questionsList.get(currentQuestionNo).getCorrect());
+
     }
 }
