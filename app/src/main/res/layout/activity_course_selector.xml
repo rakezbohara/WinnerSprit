@@ -8,20 +8,24 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:background="@color/colorPrimary"
         android:id="@+id/course_select_header">
-        <TextView
-            android:id="@+id/select_logo"
-            android:layout_marginTop="30dp"
+        <ImageView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="LOGO"
-            android:textSize="30sp"
-            android:textStyle="bold"/>
+            android:layout_marginTop="30dp"
+            android:layout_height="100dp"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:src="@drawable/epn_full"
+            android:id="@+id/select_logo"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/white"
+            android:layout_below="@+id/select_logo"/>
         <TextView
             android:layout_below="@+id/select_logo"
+            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Select the Course"

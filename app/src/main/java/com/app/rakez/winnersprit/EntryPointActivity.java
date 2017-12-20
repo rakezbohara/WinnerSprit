@@ -2,6 +2,8 @@ package com.app.rakez.winnersprit;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,10 +22,12 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.app.rakez.winnersprit.FirebaseHandler.AlarmReceiver;
 import com.app.rakez.winnersprit.data.SharedPref;
 import com.app.rakez.winnersprit.quiz.MainContainer;
 import com.app.rakez.winnersprit.selection.CourseSelector;
@@ -49,10 +53,12 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,6 +87,11 @@ public class EntryPointActivity extends AppCompatActivity implements View.OnClic
 
     @BindView(R.id.email_login_tv) TextView emailLoginTV;
     @BindView(R.id.register_tv) TextView userRegisterTV;
+
+    @BindView(R.id.logo_1)ImageView logo1;
+    @BindView(R.id.logo_2) ImageView logo2;
+    @BindView(R.id.logo_3) ImageView logo3;
+    @BindView(R.id.logo_4) ImageView logo4;
 
     FirebaseAuth firebaseAuth;
     FirebaseUser currentUser;
@@ -129,6 +140,8 @@ public class EntryPointActivity extends AppCompatActivity implements View.OnClic
             startActivity(nextActivity);
             finish();
         }
+        animateLogo();
+        enableNotification();
         emailLoginLayout.setVisibility(View.GONE);
         emailRegisterLayout.setVisibility(View.GONE);
 
@@ -161,6 +174,57 @@ public class EntryPointActivity extends AppCompatActivity implements View.OnClic
         login_fb.setOnClickListener(this);
         loginButton.setOnClickListener(this);
         registerButton.setOnClickListener(this);
+    }
+
+    private void animateLogo() {
+        Log.d(TAG, "animation should start");
+        logo2.setAlpha(0.0f);
+        logo3.setAlpha(0.0f);
+        logo4.setAlpha(0.0f);
+        logo2.animate()
+                .alpha(1.0f)
+                .setDuration(2000)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        logo2.setVisibility(View.VISIBLE);
+                    }
+                });
+        logo3.animate()
+                .alpha(1.0f)
+                .setDuration(2000)
+                .setStartDelay(1000)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        logo3.setVisibility(View.VISIBLE);
+                    }
+                });
+        logo4.animate()
+                .alpha(1.0f)
+                .setDuration(2000)
+                .setStartDelay(2000)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        logo4.setVisibility(View.VISIBLE);
+                    }
+                });
+    }
+
+    private void enableNotification() {
+        FirebaseMessaging.getInstance().subscribeToTopic("epn");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 6);
+        calendar.set(Calendar.MINUTE, 30);
+        calendar.set(Calendar.SECOND, 0);
+        Intent intent1 = new Intent(EntryPointActivity.this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(EntryPointActivity.this, 0,intent1, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) EntryPointActivity.this.getSystemService(EntryPointActivity.this.ALARM_SERVICE);
+        am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
     @Override

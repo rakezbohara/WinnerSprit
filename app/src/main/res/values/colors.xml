@@ -35,6 +35,8 @@
     <color name="transparent">#0033b5e5</color>
     <color name="white">#fff</color>
 
+    <color name="fab1">#f39d12</color>
+    <color name="fab2">#1ad88e</color>
 
     <color name="middle_color">#016158</color>
     <color name="top_color">#012d27</color>

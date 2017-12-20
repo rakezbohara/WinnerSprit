@@ -18,7 +18,7 @@
             android:title="Theory Practice" />
         <item
             android:id="@+id/nav_switch_course"
-            android:icon="@drawable/ic_logout"
+            android:icon="@drawable/ic_switch_course"
             android:title="Switch Course" />
         <item
             android:id="@+id/nav_notice"
@@ -33,16 +33,16 @@
             android:title="Other">
         <menu>
             <item
-                android:id="@+id/nav_faq"
-                android:title="FAQ"
-                android:icon="@drawable/ic_logout"/>
-            <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/ic_logout"
                 android:title="Logout" />
             <item
+                android:id="@+id/nav_faq"
+                android:title="FAQ"
+                android:icon="@drawable/ic_faq"/>
+            <item
                 android:id="@+id/nav_about_us"
-                android:icon="@drawable/ic_menu_send"
+                android:icon="@drawable/ic_about_us"
                 android:title="About Us" />
 
         </menu>

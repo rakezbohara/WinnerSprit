@@ -12,18 +12,38 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:id="@+id/layout_container">
-        <TextView
-            android:id="@+id/fullscreen_logo"
+        <FrameLayout
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="LOGO"
-            android:textSize="30sp"
-            android:textStyle="bold"/>
+            android:id="@+id/logo_holder">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:src="@drawable/anim_1"
+                android:id="@+id/logo_1"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:src="@drawable/anim_2"
+                android:id="@+id/logo_2"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:src="@drawable/anim_3"
+                android:id="@+id/logo_3"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:src="@drawable/anim_4"
+                android:id="@+id/logo_4"/>
+
+        </FrameLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/fullscreen_logo"
+            android:layout_below="@+id/logo_holder"
             android:id="@+id/layout_social_media_login">
     <FrameLayout
         android:id="@+id/FrameLayout1"

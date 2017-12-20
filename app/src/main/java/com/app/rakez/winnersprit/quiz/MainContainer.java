@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
@@ -126,6 +127,8 @@ public class MainContainer extends AppCompatActivity
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main_container);
         ButterKnife.bind(this);
+        scoreboardFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.fab1)));
+        theoryFAB.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.fab2)));
         setSupportActionBar(toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
