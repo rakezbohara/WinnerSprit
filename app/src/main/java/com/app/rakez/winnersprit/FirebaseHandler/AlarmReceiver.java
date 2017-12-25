@@ -38,6 +38,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setContentIntent(resultPendingIntent)
                 .build();
         NotificationManagerCompat manager = NotificationManagerCompat.from(context);
-        manager.notify(125, notification);
+        manager.notify(127, notification);
     }
 }

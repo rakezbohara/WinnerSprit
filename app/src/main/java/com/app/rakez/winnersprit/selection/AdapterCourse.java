@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,6 +99,8 @@ public class AdapterCourse extends RecyclerView.Adapter<AdapterCourse.MyViewHold
     public void nextCourse(){
         sharedPref.saveData("course_id",itemCourses.get(row_index).getId());
         sharedPref.saveData("course_name",itemCourses.get(row_index).getName());
+        sharedPref.saveData("syllabus",itemCourses.get(row_index).getSyllabus());
+        Log.d("Response from Course", itemCourses.get(row_index).toString());
         if(itemCourses.get(row_index).getMax_level().equals("0")){
             Toast.makeText(context,"This course currently does not have any level", Toast.LENGTH_SHORT).show();
         }else{

@@ -27,18 +27,11 @@ public class AdapterBookmarkAnswer extends RecyclerView.Adapter<AdapterBookmarkA
     List<String> answers;
     Integer correct;
     Integer row_index = -1;
-    private List<String> options = new ArrayList<>();
 
     public AdapterBookmarkAnswer(Context context, List<String> answers, Integer correct) {
         this.context = context;
         this.answers = answers;
         this.correct = correct;
-        options.add("A");
-        options.add("B");
-        options.add("C");
-        options.add("D");
-        options.add("E");
-        options.add("F");
     }
 
     @Override
@@ -51,7 +44,7 @@ public class AdapterBookmarkAnswer extends RecyclerView.Adapter<AdapterBookmarkA
     public void onBindViewHolder(MyViewHolder holder, int position) {
         String answer = answers.get(position);
         holder.answerOption.setText(answer);
-        holder.answerOptionNo.setText(options.get(position));
+        holder.answerOptionNo.setText(String.valueOf(position+1));
         if(position==correct){
             holder.answerOptionLayout.setBackgroundColor(context.getResources().getColor(R.color.answer_true_back));
             holder.answerOptionNoCV.setCardBackgroundColor(context.getResources().getColor(R.color.answer_true));

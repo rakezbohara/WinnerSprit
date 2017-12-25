@@ -139,9 +139,10 @@ public class EntryPointActivity extends AppCompatActivity implements View.OnClic
             }
             startActivity(nextActivity);
             finish();
+        }else{
+            enableNotification();
         }
         animateLogo();
-        enableNotification();
         emailLoginLayout.setVisibility(View.GONE);
         emailRegisterLayout.setVisibility(View.GONE);
 

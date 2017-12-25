@@ -57,23 +57,25 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".question.QuestionActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".bookmark.BookmarkQuestion"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".bookmark.BookmarkQuestion"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".syllabus.SyllabusActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         //Services
         <service android:name=".FirebaseHandler.MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-        <service
-            android:name=".FirebaseHandler.MyFirebaseMessagingService">
+        <service android:name=".FirebaseHandler.MyFirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
         //Receivers
-        <receiver android:name=".FirebaseHandler.AlarmReceiver"/>
+        <receiver android:name=".FirebaseHandler.AlarmReceiver" />
 
 
     </application>

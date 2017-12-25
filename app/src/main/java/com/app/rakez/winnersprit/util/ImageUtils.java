@@ -41,7 +41,7 @@ public class ImageUtils {
         return bitmap;
     }
     public boolean imageExist(Context context,String imageName){
-        File file            = context.getFileStreamPath(imageName);
+        File file = context.getFileStreamPath(imageName);
         if (file.exists()){
             Log.d("file", "my_image.jpeg exists!");
             return true;

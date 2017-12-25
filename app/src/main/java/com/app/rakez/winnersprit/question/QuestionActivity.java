@@ -34,6 +34,10 @@ import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareHashtag;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -64,6 +68,7 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
     @BindView(R.id.question_previous) TextView previousQuestionTV;
     @BindView(R.id.divider_previous) View dividerPrevious;
     @BindView(R.id.quiz_level) TextView levelTV;
+    @BindView(R.id.question_banner_ad) AdView bannerAd;
 
     //Dialog componenets
     TextView dialogScoreTV;
@@ -113,6 +118,7 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
     public boolean isReview = false;
     public boolean isCompleted;
     private Dialog resultDialog;
+    InterstitialAd interstitialAd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,9 +127,12 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_question);
+        MobileAds.initialize(this, getResources().getString(R.string.banner_add_id));
         ButterKnife.bind(this);
         currentLevel = getIntent().getExtras().getInt("level");
         isCompleted = getIntent().getExtras().getBoolean("is_completed");
+        displayBannerAd();
+        loadIntrestitialAd();
         initialize();
         loadLevel();
         //initializeQuestion(questionId.get(currentQuestionNo), questionList.get(currentQuestionNo),answersList.get(currentQuestionNo),correctAnswer.get(currentQuestionNo));
@@ -134,6 +143,27 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
         //Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/unicode.ttf");
         //questionTV.setTypeface(custom_font);
     }
+
+    private void displayBannerAd() {
+        AdRequest adRequest = new AdRequest.Builder().build();
+        bannerAd.loadAd(adRequest);
+        interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_add_id));
+        interstitialAd.loadAd(new AdRequest.Builder().build());
+    }
+
+    private void loadIntrestitialAd(){
+        interstitialAd = new InterstitialAd(this);
+        interstitialAd.setAdUnitId(getResources().getString(R.string.interstitial_add_id));
+        interstitialAd.loadAd(new AdRequest.Builder().build());
+    }
+
+    private void displayIntrestitialAd(){
+        if (interstitialAd.isLoaded()) {
+            interstitialAd.show();
+        }
+    }
+
     private void initialize() {
         //dataRepository = DataRepository.getInstance();
         questionId = new ArrayList<>();
@@ -381,6 +411,7 @@ public class QuestionActivity extends AppCompatActivity implements View.OnClickL
         dialogNextLevelButton.setOnClickListener(this);
         dialogShareFB.setOnClickListener(this);
         resultDialog.show();
+        displayIntrestitialAd();
     }
 
     private void tooglePrevious(Boolean show){

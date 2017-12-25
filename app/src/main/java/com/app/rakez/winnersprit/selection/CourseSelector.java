@@ -86,6 +86,7 @@ public class CourseSelector extends AppCompatActivity implements View.OnClickLis
             public void onDataChange(DataSnapshot dataSnapshot) {
                 itemCourses.clear();
                 for(DataSnapshot contactSnapshot : dataSnapshot.getChildren()){
+                    Log.d("tag", "Response from firebase " + contactSnapshot.toString());
                     Course course = contactSnapshot.getValue(Course.class);
                     itemCourses.add(course);
                 }
@@ -94,6 +95,8 @@ public class CourseSelector extends AppCompatActivity implements View.OnClickLis
                     Log.d("tag", "Response from firebase " + itemCourses.get(i).getName());
                     Log.d("tag", "Response from firebase " + itemCourses.get(i).getId());
                     Log.d("tag", "Response from firebase " + itemCourses.get(i).getMax_level());
+                    Log.d("tag", "Response from firebase " + itemCourses.get(i).getSyllabus());
+
                 }
                 adapterCourse.notifyDataSetChanged();
                 hideProgressDialog();

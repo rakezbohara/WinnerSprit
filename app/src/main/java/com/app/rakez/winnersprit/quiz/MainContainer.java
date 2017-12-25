@@ -112,7 +112,7 @@ public class MainContainer extends AppCompatActivity
 
     DatabaseReference databaseReference;
 
-    //LeaderBpeard Component
+    //LeaderBoard Component
     Dialog leaderDialog;
     RecyclerView dialogLeaderRV;
     Button dialogLeaderDone;
@@ -163,8 +163,8 @@ public class MainContainer extends AppCompatActivity
         email = sharedPref.getStringData("email");
         loginProvider = sharedPref.getStringData("login_provider");
         imageExist = sharedPref.getBooleanData("image_exist");
-        Log.d(TAG,"course id "+courseId);
-        Log.d(TAG,"course id "+courseName);
+        Log.d(TAG,"course info "+courseId);
+
         if(imageExist){
             userImage = imageUtils.loadImageBitmap(this,uId);
             profileImage.setImageBitmap(userImage);
@@ -203,9 +203,7 @@ public class MainContainer extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -240,6 +238,16 @@ public class MainContainer extends AppCompatActivity
                  Intent intent = new Intent(this, CourseSelector.class);
                  startActivity(intent);
                  finish();
+             case R.id.nav_about_us:
+                 fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                 fragmentTransaction.replace(R.id.fragment_container, AboutUsFragment.getInstance());
+                 fragmentTransaction.commit();
+                 break;
+             case R.id.nav_syllabus:
+                 fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                 fragmentTransaction.replace(R.id.fragment_container, SyllabusFragment.getInstance());
+                 fragmentTransaction.commit();
+                 break;
              default:
                  break;
          }

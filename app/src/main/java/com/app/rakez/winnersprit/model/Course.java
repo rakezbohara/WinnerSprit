@@ -9,14 +9,16 @@ public class Course {
     private String id;
     private String name;
     private String max_level;
+    private String syllabus;
 
     public Course() {
     }
 
-    public Course(String id, String name, String max_level) {
+    public Course(String id, String name, String max_level, String syllabus) {
         this.id = id;
         this.name = name;
         this.max_level = max_level;
+        this.syllabus = syllabus;
     }
 
     public String getId() {
@@ -41,5 +43,18 @@ public class Course {
 
     public void setMax_level(String max_level) {
         this.max_level = max_level;
+    }
+
+    public String getSyllabus() {
+        return syllabus;
+    }
+
+    public void setSyllabus(String syllabus) {
+        this.syllabus = syllabus;
+    }
+
+    @Override
+    public String toString() {
+        return id+" "+name+" "+max_level+" "+syllabus;
     }
 }
